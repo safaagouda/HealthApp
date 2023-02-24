@@ -91,7 +91,7 @@ class doctor {
     try {
       const newDoctor = await doctorModel({ ...req.body, status: "pending" });
       await newDoctor.addLocations(req.body.Latitude, req.body.Longitude);
-      await newDoctor.addAddress(req.body.tel,req.body.city,req.body.street,req.body.email,req.body.placeNumber)
+      await newDoctor.addAddress(...req.body.tel,req.body.city,req.body.street,req.body.email,req.body.placeNumber)
       await newDoctor.save();
       const adminUser = await userModel.findOne({ isAdmin: true });
       const Notification = adminUser.Notification;
