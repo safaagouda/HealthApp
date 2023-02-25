@@ -84,7 +84,7 @@ userSchema.statics.checkPass = async (email, oldPass) => {
   return userData;
 };
 userSchema.statics.login = async (email, pass) => {
-  const userData = await user.findOne({ email });
+  const userData = await user.findOne({ email, Isverified:true});
   if (!userData) throw new Error("invalid email");
   const checkPass = await bcrypt.compare(pass, userData.password);
   if (!checkPass) throw new Error("invalid Password");
