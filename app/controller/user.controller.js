@@ -141,7 +141,7 @@ class user {
   };
   static editPass = async (req, res) => {
     try {
-      const valid = await userModel.checkPass(req.body.email, req.body.oldPass);
+      const valid = await userModel.checkPass(req.user.id, req.body.oldPass);
       if (!valid) throw new Error("enter correct pass");
       valid.password = req.body.password;
       await valid.save();
