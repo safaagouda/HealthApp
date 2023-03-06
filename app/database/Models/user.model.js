@@ -100,9 +100,9 @@ userSchema.pre("save", async function () {
     data.password = await bcrypt.hash(data.password, 12);
   }
 });
-userSchema.statics.checkPass = async (email, oldPass) => {
-  const userData = await user.findOne({ email });
-  if (!userData) throw new Error("invalid email");
+userSchema.statics.checkPass = async (id, oldPass) => {
+  const userData = await user.findById({ _id:id });
+  if (!userData) throw new Error("user not found");
   const checkPass = await bcrypt.compare(oldPass, userData.password);
   if (!checkPass) throw new Error("invalid Password");
   return userData;
