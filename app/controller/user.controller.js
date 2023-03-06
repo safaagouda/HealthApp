@@ -102,7 +102,7 @@ class user {
           });
         }
       }else{
-        res.status(200).send({data:"password not valid"})
+        res.status(200).send({data:"email Not found"})
       }
     }
       catch (e) {
