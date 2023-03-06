@@ -98,8 +98,6 @@ class user {
           });
         } else {
           res.status(200).send({
-            apiStatus: true,
-            data: user,
             message: "password is incorrect",
           });
         }
