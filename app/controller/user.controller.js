@@ -177,11 +177,13 @@ class user {
           });
         } else {
           res.status(200).send({
+            apiStatus: true,
             message: "invalid password",
           });
         }
       } else {
         res.status(200).send({
+          apiStatus: true,
           message: "invalid email",
         });
       }
@@ -329,7 +331,6 @@ class user {
 
         const email = req.body.email;
         const randomString = unique()
-        req.body.uniqueString = uniqueString;
         const data = await userModel.updateOne(
           { email: email },
           { $set: { RandomNumber: randomString } }
