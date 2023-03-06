@@ -117,7 +117,6 @@ class user {
   static editUser = async (req, res) => {
     try {
       const myUpdates = Object.keys(req.body);
-      console.log(myUpdates)
       const allowedEdits = ["name","email","city","phone","from"];
       const validEdits = myUpdates.every((update) =>
         allowedEdits.includes(update)
@@ -130,7 +129,7 @@ class user {
       res.status(200).send({
         apiStatus: true,
         date: user,
-        message: "user data fetched",
+        message: "user data updated",
       });
     } catch (e) {
       res.status(500).send({
