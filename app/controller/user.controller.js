@@ -18,6 +18,16 @@ function generateRandomNumber() {
   var maxm = 999999;
   return Math.floor(Math.random() * (maxm - minm + 1)) + minm;
 }
+
+
+const unique = ()=>{
+	let digits = '0123456789';
+	let OTP = '';
+	for (let i = 0; i < 4; i++ ) {
+		OTP += digits[Math.floor(Math.random() * 10)];
+	}
+	return OTP;
+}				
 var mailOptions;
 class user {
   static uploadImage = async (req, res) => {
@@ -74,12 +84,25 @@ class user {
   static deleteAccount = async (req, res) => {
     if (req.body.userId === req.params.id) {
       try {
-        await userModel.findByIdAndDelete(req.params.id);
-        res.status(200).send({
-          apiStatus: true,
-          data: user,
-          message: "Account has been deleted",
-        });
+        const user = await userModel.findById(req.params.id);
+        const checkPass = await bcrypt.compare(
+          req.body.password,
+          user.password
+        );
+        if (checkPass) {
+          await userModel.deleteOne({ user });
+          res.status(200).send({
+            apiStatus: true,
+            data: user,
+            message: "Account has been deleted",
+          });
+        } else {
+          res.status(200).send({
+            apiStatus: true,
+            data: user,
+            message: "password is incorrect",
+          });
+        }
       } catch (e) {
         res.status(500).send({
           apiStatus: false,
@@ -94,7 +117,8 @@ class user {
   static editUser = async (req, res) => {
     try {
       const myUpdates = Object.keys(req.body);
-      const allowedEdits = ["professional_statement", "email"];
+      console.log(myUpdates)
+      const allowedEdits = ["name","email","city","phone","from"];
       const validEdits = myUpdates.every((update) =>
         allowedEdits.includes(update)
       );
@@ -120,7 +144,7 @@ class user {
     try {
       const valid = await userModel.checkPass(req.body.email, req.body.oldPass);
       if (!valid) throw new Error("enter correct pass");
-      valid.password = req.body.newPass;
+      valid.password = req.body.password;
       await valid.save();
       res.status(200).send({
         apiStatus: true,
@@ -137,13 +161,32 @@ class user {
   };
   static login = async (req, res) => {
     try {
-      const userData = await userModel.login(req.body.email, req.body.password);
-      const token = await userData.generateToken();
-      res.status(200).send({
-        apiStatus: true,
-        data: { userData, token },
-        message: "Logged In",
-      });
+      const userData = await userModel.findOne({ email: req.body.email });
+      if (userData) {
+        const checkPass = await bcrypt.compare(
+          req.body.password,
+          userData.password
+        );
+        if (checkPass) {
+          const token = await userData.generateToken();
+          userData.save();
+          res.status(200).send({
+            apiStatus: true,
+            data: { userData, token },
+            message: "Logged In",
+          });
+        } else {
+          res.status(200).send({
+            apiStatus: true,
+            message: "invalid password",
+          });
+        }
+      } else {
+        res.status(200).send({
+          apiStatus: true,
+          message: "invalid email",
+        });
+      }
     } catch (e) {
       res.status(500).send({
         apiStatus: false,
@@ -178,9 +221,14 @@ class user {
           .status(200)
           .send({ apiStatus: false, message: "User Already exist" });
       }
-      const uniqueString = generateRandomNumber();
-      req.body.uniqueString = uniqueString;
-      const user = new userModel(req.body);
+      const user = new userModel({ ...req.body });
+      if (req.body.isDoctor == "true") {
+        user.status = "pending";
+        user.img = req.file.path.replace("public\\", "") || "";
+      }
+
+      const uniqueString = unique()
+      user.uniqueString = uniqueString;
       mailOptions = {
         from: '"verification your account" <sm6229639gmail.com>',
         to: req.body.email,
@@ -190,6 +238,20 @@ class user {
           uniqueString,
       };
       await user.save();
+      if (req.body.isDoctor) {
+        const adminUser = await userModel.findOne({ isAdmin: true });
+        const Notification = adminUser.Notification;
+        Notification.push({
+          type: "apply-doctor-request",
+          message: `${user.name}  has applied for a doctor account`,
+          data: {
+            doctorId: user._id,
+            name: user.name,
+            onclickPath: "/admin/doctors",
+          },
+        });
+        await adminUser.save();
+      }
       mailTransport.sendMail(mailOptions, (err, info) => {
         if (err) {
           console.log(err);
@@ -212,12 +274,9 @@ class user {
   };
   static send = async (req, res) => {
     try {
-      const uniqueString = generateRandomNumber();
-      req.body.uniqueString = uniqueString;
-
+      const uniqueString = unique();
       const user = await userModel.findOne({ email: req.body.email });
       user.uniqueString = uniqueString;
-
       mailOptions = {
         from: '"Clinic " <sm6229639gmail.com>',
         to: req.body.email,
@@ -270,12 +329,9 @@ class user {
     try {
       const userData = await userModel.findOne({ email: req.body.email });
 
-      if (userData) {
         const email = req.body.email;
-        const randomString = randomstring.generate({
-          length: 6,
-          charset: "hex",
-        });
+        const randomString = unique()
+        req.body.uniqueString = uniqueString;
         const data = await userModel.updateOne(
           { email: email },
           { $set: { RandomNumber: randomString } }
@@ -284,7 +340,7 @@ class user {
           from: '"Clinic"<sm6229639gmail.com>',
           to: email,
           subject: "For Reset Password",
-          html: "<p>Hii" + userData.name + "your code is " + randomString,
+          html: "<p>Hi" + userData.name + "your code is " + randomString,
         };
         mailTransport.sendMail(mailOptions, (err, info) => {
           if (err) {
@@ -298,11 +354,6 @@ class user {
           data: data,
           message: "check your inbox of mail and reset your password.",
         });
-      } else {
-        res
-          .status(200)
-          .send({ apiStatus: true, data: "this email does not exists" });
-      }
     } catch (e) {
       res.status(500).send({ apiStatus: false, data: e, message: e.message });
     }
@@ -319,7 +370,7 @@ class user {
       res.status(200).send({
         apiStatus: true,
         data: user,
-        message: "verified",
+        message: "password changed successfully",
       });
     } catch (e) {
       res.status(500).send({
@@ -354,25 +405,6 @@ class user {
       });
     }
   };
-  static editData = async (req, res) => {
-    //   try {
-    //   //   const post = await userModel.findById(req.params.id);
-    //   //   if (post.userId === req.body.userId) {
-    //   //     const updatePost = await userModel.updateOne({ $set: req.body });
-    //   //     res.status(200).send({
-    //   //       apiStatus: true,
-    //   //       data: updatePost,
-    //   //       message: "edited successfully",
-    //   //     });
-    //   //   }
-    //   // } catch (e) {
-    //   //   res.status(500).send({
-    //   //     apiStatus: false,
-    //   //     data: e,
-    //   //     message: e.message,
-    //   //   });
-    //   // }
-  };
   static nearstDoctor = async (req, res) => {
     try {
       const Latitude = req.body.Latitude;
@@ -386,9 +418,9 @@ class user {
               coordinates: [parseFloat(Latitude), parseFloat(Longitude)],
             },
             distanceField: "distance.calculated",
-            maxDistance: parseFloat(1000)*1609,
+            maxDistance: parseFloat(1000) * 1609,
             key: "Loc",
-            spherical:true
+            spherical: true,
           },
         },
         {
@@ -397,7 +429,7 @@ class user {
       ]);
       res.status(200).send({
         apiStatus: true,
-        data: {doctorData},
+        data: { doctorData },
         message: "doctors fetched successfully",
       });
     } catch (E) {
@@ -482,10 +514,14 @@ class user {
   };
   static getalldoctors = async (req, res) => {
     try {
-      const doctors = await doctorModel.find({ status: "accepted" });
+      const pageNum = req.query.pageNum
+      const pageLimit =req.query.pageLimit || 0
+      const count = await userModel.count({isDoctor:true, status: "accepted" })
+      const doctors=await userModel.find({isDoctor:true, status: "accepted" }).limit(+pageLimit).skip(pageLimit*pageNum)
       res.status(200).send({
         apiStatus: true,
         data: doctors,
+        count,
         message: "doctors fetched successfully",
       });
     } catch (e) {
