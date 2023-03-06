@@ -82,9 +82,9 @@ class user {
     }
   };
   static deleteAccount = async (req, res) => {
-    if (req.body.userId === req.params.id) {
       try {
         const user = await userModel.findById(req.params.id);
+        if(user){
         const checkPass = await bcrypt.compare(
           req.body.password,
           user.password
@@ -101,16 +101,18 @@ class user {
             message: "password is incorrect",
           });
         }
-      } catch (e) {
+      }else{
+        res.status(200).send({data:"password not valid"})
+      }
+    }
+      catch (e) {
         res.status(500).send({
           apiStatus: false,
           data: e,
           message: e.message,
         });
       }
-    } else {
-      res.status(403).json("You can delete only your account!");
-    }
+  
   };
   static editUser = async (req, res) => {
     try {
