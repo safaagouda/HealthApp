@@ -177,13 +177,11 @@ class user {
           });
         } else {
           res.status(200).send({
-            apiStatus: true,
             message: "invalid password",
           });
         }
       } else {
         res.status(200).send({
-          apiStatus: true,
           message: "invalid email",
         });
       }
