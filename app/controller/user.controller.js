@@ -327,13 +327,13 @@ class user {
   static forgot_password = async (req, res) => {
     try {
       const userData = await userModel.findOne({ email: req.body.email });
-
         const email = req.body.email;
         const randomString = unique()
-        const data = await userModel.updateOne(
-          { email: email },
-          { $set: { RandomNumber: randomString } }
-        );
+        if(userData){
+          const data = await userModel.updateOne(
+            { email: email },
+            { $set: { RandomNumber: randomString } }
+          );
         mailOptions = {
           from: '"Clinic"<sm6229639gmail.com>',
           to: email,
@@ -351,7 +351,13 @@ class user {
           apiStatus: true,
           data: data,
           message: "check your inbox of mail and reset your password.",
-        });
+        });}else{
+          res.status(500).send({
+
+           
+            message: "email not found",
+          });
+        }
     } catch (e) {
       res.status(500).send({ apiStatus: false, data: e, message: e.message });
     }
