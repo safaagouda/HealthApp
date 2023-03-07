@@ -351,8 +351,9 @@ class user {
           apiStatus: true,
           data: data,
           message: "check your inbox of mail and reset your password.",
-        });}else{
-          res.status(500).send({
+        })
+	}else{
+          res.status(200).send({
 
            
             message: "email not found",
