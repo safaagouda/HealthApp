@@ -14,7 +14,7 @@ const specializeSchema = new mongoose.Schema(
       required: true,
       ref: "user",
     },
-    img: Array,
+    img: String,
   },
   { timestamps: true }
 );
