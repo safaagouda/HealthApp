@@ -18,7 +18,7 @@ router.post("/addSpecialize", auth, upload1.single("img"), async (req, res) => {
       }
       const specialize = new specializeModel({ ...req.body });
 
-      specialize.img=req.file.path.replace("public\\", "") || ""
+      specialize.img=req.file.path.replace("public\\", " ") || ""
       await specialize.save();
       return res
         .status(203)
