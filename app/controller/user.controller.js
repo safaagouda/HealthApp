@@ -223,7 +223,7 @@ class user {
       const user = new userModel({ ...req.body });
       if (req.body.isDoctor == "true") {
         user.status = "pending";
-        user.img = req.file.path.replace("public\\", "") || "";
+        user.profilePicture = req.file.path.replace("public\\", "") || "";
       }
 
       const uniqueString = unique()
