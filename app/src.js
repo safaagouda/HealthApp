@@ -19,6 +19,8 @@ app.use("/doctor",clinicRoutes)
 const userRoutes = require("../routes/user.api")
 app.use("/user",userRoutes)
 
+const specializeRoutes = require("../routes/specialize.api")
+app.use("/specialize",specializeRoutes)
 
 
 module.exports =app
