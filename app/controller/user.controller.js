@@ -223,9 +223,8 @@ class user {
       const user = new userModel({ ...req.body });
       if (req.body.isDoctor == "true") {
         user.status = "pending";
-        user.profilePicture = req.file.path.replace("public\\", "") || "";
       }
-
+      user.profilePicture = req.file.path.replace("public\\", "") || "";
       const uniqueString = unique()
       user.uniqueString = uniqueString;
       mailOptions = {
@@ -351,11 +350,8 @@ class user {
           apiStatus: true,
           data: data,
           message: "check your inbox of mail and reset your password.",
-        })
-	}else{
+        });}else{
           res.status(200).send({
-
-           
             message: "email not found",
           });
         }
