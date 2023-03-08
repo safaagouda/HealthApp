@@ -67,12 +67,6 @@ const userSchema = mongoose.Schema(
       type: String,
       max: 50,
     },
-    img: {
-      type: String,
-      required: function () {
-        return this.isDoctor == true;
-      },
-    },
     phone: {
       type: Number
     },
@@ -82,6 +76,9 @@ const userSchema = mongoose.Schema(
     },
     uniqueString:{
       type:Number
+    },
+    practiceLicense:{
+      type:String
     }
   },
   { timestamps: true }
