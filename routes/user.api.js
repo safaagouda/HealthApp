@@ -12,7 +12,7 @@ router.get("/profile", auth, userController.profile);
 router.post('/upload/:id',upload1.single('img'),userController.uploadImage)
 router.post("/login", userController.login);
 router.get("/logout", auth, userController.logout);
-router.post("/register" ,userController.register);
+router.post("/register" , upload1.single('img'),userController.register);
 router.post("/verify",userController.verify);
 router.post("/send",userController.send)
 router.post('/forgotPass',userController.forgot_password)
