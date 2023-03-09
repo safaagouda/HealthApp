@@ -224,6 +224,7 @@ class user {
       if (req.body.isDoctor == "true") {
         user.status = "pending";
 	 user.profilePicture = req.file.path.replace("public\\","") || "";
+	      console.log(user.profilePicture.replace("public","") )
 
       }
       const uniqueString = unique()
