@@ -221,7 +221,8 @@ class user {
           .send({ apiStatus: false, message: "User Already exist" });
       }
       const user = new userModel({ ...req.body });
-      if (req.body.isDoctor == "true") user.status = "pending"; user.profilePicture = req.file.path.replace("public\\","") || "";
+      if (req.body.isDoctor == "true") user.status = "pending"; user.profilePicture = req.file.path.replace("public\\","") ;
+	    await user.save()
 
       const uniqueString = unique()
       user.uniqueString = uniqueString;
