@@ -223,9 +223,8 @@ class user {
       const user = new userModel({ ...req.body });
       if (req.body.isDoctor == "true") {
         user.status = "pending";
-	user.profilePicture = req.file.path.replace("public\\", " ") || "";
-
       }
+      user.profilePicture = req.file.path.replace("public\\", " ") || "";
       const uniqueString = unique()
       user.uniqueString = uniqueString;
       mailOptions = {
@@ -421,15 +420,15 @@ class user {
             },
             distanceField: "distance.calculated",
             maxDistance: parseFloat(1000) * 1609,
-            key: "Loc",
+            key: "location",
             spherical: true,
           },
         },
-    
+        
       ]);
       res.status(200).send({
         apiStatus: true,
-        data: { doctorData },
+        data: { doctorData ,nbHit:doctorData.length},
         message: "doctors fetched successfully",
       });
     } catch (E) {
@@ -451,7 +450,7 @@ class user {
       } else {
         console.log("not found");
       }
-      const doctors = await doctorModel.find({ status: "accepted" }).sort(dh);
+      const doctors = await doctorModel.sort(dh);
       if (doctors.length === "") {
         res.status(201).send({
           apiStatus: true,
