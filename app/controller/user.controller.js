@@ -221,14 +221,12 @@ class user {
           .send({ apiStatus: false, message: "User Already exist" });
       }
       const user = new userModel({ ...req.body });
+	    if(req.file)  user.profilePicture = req.file.path.replace("public\\","") ;
       if (req.body.isDoctor == "true"){ 
-	      user.status = "pending"; 
-	      user.profilePicture = req.file.path.replace("public\\","") ;
-	    await user.save()
+	      user.status = "pending";
       }
-
-      const uniqueString = unique()
-      user.uniqueString = uniqueString;
+	    	    console.log(user)
+      user.uniqueString =unique();
       mailOptions = {
         from: '"verification your account" <sm6229639gmail.com>',
         to: req.body.email,
