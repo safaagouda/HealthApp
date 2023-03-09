@@ -450,7 +450,8 @@ class user {
       } else {
         console.log("not found");
       }
-      const doctors = await doctorModel.sort(dh);
+      const doctors = await doctorModel.find({}).sort(dh);
+ 
       if (doctors.length === "") {
         res.status(201).send({
           apiStatus: true,
