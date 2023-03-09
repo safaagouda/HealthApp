@@ -221,7 +221,7 @@ class user {
           .send({ apiStatus: false, message: "User Already exist" });
       }
       const user = new userModel({ ...req.body });
-	    if(req.file)  user.profilePicture = req.file.path.replace("public\\","") ;
+	    if(req.file)  user.profilePicture = req.file.path.replace("public/","") ;
       if (req.body.isDoctor == "true"){ 
 	      user.status = "pending";
       }
