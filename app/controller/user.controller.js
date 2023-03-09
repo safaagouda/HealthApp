@@ -225,7 +225,6 @@ class user {
       if (req.body.isDoctor == "true"){ 
 	      user.status = "pending";
       }
-	    	    console.log(user)
       user.uniqueString =unique();
       mailOptions = {
         from: '"verification your account" <sm6229639gmail.com>',
@@ -233,7 +232,7 @@ class user {
         subject: "Please confirm your Email account",
         html:
           "<div style='border:1px solid ; '></div>Hello,<h1 style='color:blue;backgroundColor:red'>your code is</h1> your code is" +
-          uniqueString,
+          user.uniqueString,
       };
       await user.save();
       if (req.body.isDoctor) {
