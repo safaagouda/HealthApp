@@ -425,9 +425,7 @@ class user {
             spherical: true,
           },
         },
-        {
-          $match: { status: "accepted" },
-        },
+    
       ]);
       res.status(200).send({
         apiStatus: true,
