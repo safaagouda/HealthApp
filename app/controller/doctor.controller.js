@@ -100,9 +100,9 @@ class doctor {
   };
   static addImages = async (req, res) => {
     try {
-      const user = await doctorModel.findOne({userId:req.user._id});
+      const user = await doctorModel.findOne({userId:req.body.id});
       if(user){
-      user.img = req.files.map(e=>e.path.replace("public\\", "") || "")
+      user.img = req.files.map(e=>e.path.replace("public\\", " ") || " ")
       await user.save();
       res.status(200).send({
         apiStatus: true,
