@@ -221,10 +221,7 @@ class user {
           .send({ apiStatus: false, message: "User Already exist" });
       }
       const user = new userModel({ ...req.body });
-	    if(req.file)  user.profilePicture = req.file.path.replace("public/","") ;
-      if (req.body.isDoctor == "true"){ 
-	      user.status = "pending";
-      }
+  user.profilePicture = req.file.path.replace("public/","") || "" ;
       user.uniqueString =unique();
       mailOptions = {
         from: '"verification your account" <sm6229639gmail.com>',
@@ -234,8 +231,8 @@ class user {
           "<div style='border:1px solid ; '></div>Hello,<h1 style='color:blue;backgroundColor:red'>your code is</h1> your code is" +
           user.uniqueString,
       };
-      await user.save();
       if (req.body.isDoctor) {
+	user.status = "pending";
         const adminUser = await userModel.findOne({ isAdmin: true });
         const Notification = adminUser.Notification;
         Notification.push({
@@ -256,6 +253,8 @@ class user {
           console.log("Mail has been sent :- ", info.response);
         }
       });
+	          await user.save();
+
       res.status(200).send({
         apiStatus: true,
         data: { user },
