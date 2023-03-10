@@ -212,7 +212,7 @@ class user {
       res.status(500).send({ apiStatus: false, data: e, message: e.message });
     }
   };
-  static register = async (req, res) => {
+    static register = async (req, res) => {
     try {
       const existingUser = await userModel.findOne({ email: req.body.email });
       if (existingUser) {
@@ -221,18 +221,24 @@ class user {
           .send({ apiStatus: false, message: "User Already exist" });
       }
       const user = new userModel({ ...req.body });
-  user.profilePicture = req.file.path.replace("public/","") || "" ;
-      user.uniqueString =unique();
+      if (req.body.isDoctor == "true") {
+        user.status = "pending";
+        console.log(req.file)
+        user.profilePicture = req.file.path.replace("public\\", "") || "";
+        await user.save();
+      }
+      const uniqueString = unique();
+      user.uniqueString = uniqueString;
       mailOptions = {
         from: '"verification your account" <sm6229639gmail.com>',
         to: req.body.email,
         subject: "Please confirm your Email account",
         html:
           "<div style='border:1px solid ; '></div>Hello,<h1 style='color:blue;backgroundColor:red'>your code is</h1> your code is" +
-          user.uniqueString,
+          uniqueString,
       };
+      await user.save();
       if (req.body.isDoctor) {
-	user.status = "pending";
         const adminUser = await userModel.findOne({ isAdmin: true });
         const Notification = adminUser.Notification;
         Notification.push({
@@ -253,8 +259,6 @@ class user {
           console.log("Mail has been sent :- ", info.response);
         }
       });
-	          await user.save();
-
       res.status(200).send({
         apiStatus: true,
         data: { user },
