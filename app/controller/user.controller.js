@@ -223,7 +223,6 @@ class user {
       const user = new userModel({ ...req.body });
       if (req.body.isDoctor == "true") {
         user.status = "pending";
-        console.log(req.file)
         user.profilePicture = req.file.path.replace("public/", "") || "";
         await user.save();
       }
