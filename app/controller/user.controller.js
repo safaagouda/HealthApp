@@ -226,7 +226,6 @@ class user {
         user.profilePicture = req.file.path.replace("public/", "") || "";
         await user.save();
       }
-	    console.log(user)
       const uniqueString = unique();
       user.uniqueString = uniqueString;
       mailOptions = {
